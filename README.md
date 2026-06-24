@@ -1,181 +1,119 @@
-# 📦 Carton Calculator
+# Carton Calculator
 
-A professional, browser-based carton planning tool for warehouse and dispatch teams. Enter shipment item dimensions, pick a box category, and the app allocates the right cartons — showing total boxes, gross weight, volume weight, and carton tare in one clean output.
-
-Built with **pure Python** (no framework), **SQLite**, and **vanilla JS** — zero external dependencies beyond `openpyxl`.
-
----
-
-## ✨ Features
-
-- **Carton allocation engine** — picks the largest carton first, fills with the smallest suitable box for leftover volume
-- **Excel upload** — import item sheets directly; download a pre-formatted template
-- **Saved calculations** — exportable history with per-user access control
-- **Admin panel** — upload/replace the carton master, reset user passwords
-- **Multi-user login** — session-based auth with role separation (admin / user)
-- **No internet required** — fully self-contained, runs locally or on any server
-
----
-
-## 🗂️ Project Structure
-
-```
-carton-calculator-app/
-├── server.py                  # Python HTTP server + all API logic
-├── requirements.txt           # Only dependency: openpyxl
-├── run-windows.bat            # One-click launcher for Windows
-├── run-mac-linux.sh           # One-click launcher for macOS/Linux
-├── data/
-│   └── app.db                 # SQLite database (auto-created on first run)
-└── static/
-    ├── index.html
-    ├── styles.css
-    └── app.js
-```
-
----
-
-## 🚀 Running Locally
-
-**Requirements:** Python 3.11 or newer
+## Easiest way to run it
 
 ### Windows
-Double-click `run-windows.bat` — it installs dependencies and opens the app automatically.
 
-### macOS / Linux
+1. Extract the ZIP file completely.
+2. Open the extracted folder.
+3. Double-click `run-windows.bat`.
+4. Your browser will open at `http://127.0.0.1:8000`.
+5. Keep the black server window open while using the app. Press `Ctrl+C` to stop it.
+
+### macOS or Linux
+
+Open Terminal in the app folder and run:
+
 ```bash
-chmod +x run-mac-linux.sh
 ./run-mac-linux.sh
 ```
 
-### Manual (any OS)
-```bash
+The app supports Python 3.11 and newer, including Python 3.13.
+
+A frill-free hosted web app for calculating carton requirements by total item volume.
+
+## Run Locally
+
+Use Python 3.11 or newer.
+
+On Windows, you can also double-click:
+
+```text
+run-windows.bat
+```
+
+`start_carton_calculator.bat` is also included and forwards to `run-windows.bat`.
+
+```powershell
 pip install -r requirements.txt
 python server.py
 ```
 
-Then open: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+Open:
 
----
-
-## ☁️ Deploying for Free (Render)
-
-Render is the easiest free hosting option for this app. The server already reads the `PORT` environment variable, so no code changes are needed.
-
-1. Push this repo to GitHub
-2. Go to [render.com](https://render.com) and sign up with GitHub
-3. Click **New → Web Service** and connect this repo
-4. Set the following:
-
-   | Setting | Value |
-   |---|---|
-   | **Environment** | Python 3 |
-   | **Build Command** | `pip install -r requirements.txt` |
-   | **Start Command** | `python server.py` |
-
-5. Click **Deploy** — your app will be live at `https://yourapp.onrender.com`
-
-> ⚠️ Render's free tier spins down after 15 minutes of inactivity. The first request after idle takes ~30 seconds to wake up. Upgrade to a paid plan to keep it always-on.
-
----
-
-## 👤 Default Users
-
-All accounts start with the password below. **Change it immediately after first login.**
-
-```
-Password: ChangeMe123!
+```text
+http://127.0.0.1:8000
 ```
 
-| Username | Role |
-|---|---|
-| admin | Admin |
-| priyanka | User |
-| vandana | User |
-| kalpna | User |
-| poonam | User |
-| meghna | User |
-| sumit | User |
-| jisha | User |
-| larissa | User |
+## Default Users
 
-The `admin` account can upload carton masters, reset any user's password, and view all saved calculations.
+All default users start with this password:
 
----
+```text
+ChangeMe123!
+```
 
-## 📋 Box Categories
+Users created:
 
-| Category | Usable Volume |
-|---|---|
-| Direct Outer | 90% |
-| Thermocol Box | 90% |
-| Temperature Thermocol Box | 70% |
-| Validated Cold Chain Box | 90% |
+- admin
+- priyanka
+- vandana
+- kalpna
+- poonam
+- meghna
+- sumit
+- jisha
+- larissa
 
----
+The `admin` user has admin access. All other users are standard users.
 
-## 📥 Excel Upload Formats
+## Box Categories
 
-### Item Upload (for calculations)
+- Direct Outer: 90% usable volume
+- Thermocol Box: 90% usable volume
+- Temperature Thermocol Box: 70% usable volume
+- Validated Cold Chain Box: 90% usable volume
+- Max Cold Chain Boxes: 95% usable volume
 
-| Column | Required | Notes |
-|---|---|---|
-| Item Name | Yes | |
-| Length | Yes | mm |
-| Breadth | Yes | mm |
-| Height | Yes | mm |
-| Quantity | Yes | |
-| Weight per Unit (g) | No | If blank, gross weight is skipped |
+## Carton Master Columns
 
-### Carton Master Upload (Admin only)
+- Code
+- Category
+- Length
+- Breadth
+- Height
+- Volume
+- Tare Weight
 
-| Column | Notes |
-|---|---|
-| Code | Unique carton identifier |
-| Category | Must match a valid category name |
-| Length | mm |
-| Breadth | mm |
-| Height | mm |
-| Volume | mm³ |
-| Tare Weight | Grams |
+Dimensions and volume are in centimetres and cubic centimetres. Tare weight is treated as grams.
 
-Download the templates directly from the app (Calculator → "Download Item Template", Admin → "Carton Template").
+## Item Upload Columns
 
----
+- Item Name
+- Length
+- Breadth
+- Height
+- Quantity
+- Weight per Unit (g)
 
-## 🧮 Calculation Logic
+Item weight is optional. If any item weight is missing, gross weight is not calculated.
 
-1. Filters cartons by the selected category
-2. Applies the category's usable volume percentage
-3. Sorts by volume descending — fills largest carton first
-4. Uses the smallest suitable carton for any remaining volume
-5. **Volume weight** = Total carton volume ÷ 6000
-6. **Gross weight** = Sum of (item weight × quantity) + carton tare weight
+## Calculation Rule
 
-If any item is missing a weight, gross weight is not calculated and a warning is shown.
+The app filters cartons by the selected category, applies the category usable percentage, uses the largest carton first, and then chooses the smallest suitable carton for the leftover volume.
 
----
+Volume weight is calculated as:
 
-## 🗃️ Data & Reset
+```text
+Total selected carton volume / 6000
+```
 
-All data is stored in `data/app.db` (SQLite). 
+## Data
 
-To start completely fresh — delete this file and restart the server. The database and default users are recreated automatically.
+The app stores data in:
 
----
+```text
+data/app.db
+```
 
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Backend | Python 3.11+ — `http.server.ThreadingHTTPServer` |
-| Database | SQLite via `sqlite3` (stdlib) |
-| Excel I/O | `openpyxl` |
-| Frontend | Vanilla HTML, CSS, JavaScript — no frameworks |
-| Auth | Secure session tokens, bcrypt-style password hashing |
-
----
-
-## 📄 License
-
-Internal use — Century Inks Private Limited.
+For a fresh install, delete `data/app.db` and restart the app.
